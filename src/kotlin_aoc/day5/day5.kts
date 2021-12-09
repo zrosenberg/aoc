@@ -34,9 +34,47 @@ fun main() {
         }
     }
 
+    addDiags(ventList, ventLocations)
+
     val count = ventLocations.filter { (_, v) ->
         v >= 2
     }.count()
 
     println(count)
 }
+
+fun incrementLocation(ventLocations: MutableMap<Pair<Int, Int>, Int>, x: Int, y: Int) {
+    val count = ventLocations.getOrDefault(Pair(x, y), 0)
+    ventLocations[Pair(x, y)] = count + 1
+}
+
+fun addDiags(ventList: List<Pair<Pair<Int, Int>, Pair<Int, Int>>>, ventLocations: MutableMap<Pair<Int, Int>, Int>) {
+    // If the X and Y of both ends are different, we got a diagonal.
+    ventList.filter { (start, end) ->
+        start.first != end.first && start.second != end.second
+    }.forEach { (start, end) ->
+        val xStart = min(start.first, end.first)
+        val xEnd = max(start.first, end.first)
+
+        // The Y start will be the one farthest to the left. Rely on the X to find it
+        val yStart: Int;
+        val yEnd: Int
+        if(start.first < end.first) {
+            yStart = start.second
+            yEnd = end.second
+        } else {
+            yStart = end.second
+            yEnd = start.second
+        }
+
+        // Then determine if we are going up or down diagonally
+        val yOffset = if (yStart < yEnd) 1 else -1
+
+        for(x in xStart ..  xEnd) {
+            // the yOffset tells us up or down, use that to move
+            val offset = x - xStart
+            incrementLocation(ventLocations, x, yStart + (offset * yOffset))
+        }
+    }
+}
+
