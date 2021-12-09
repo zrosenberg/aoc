@@ -10,10 +10,11 @@ val min = locations.minOrNull()!!
 
 val fuelCost = MutableList(max + 1){0}
 
-// This is quadratic time
+// This is n^2 time
 // I wonder if a binary search works for this
+// or we can keep track of the min moves so far and bail if we go over that
 for(i in min .. max) {
-    fuelCost[i] = locations.sumOf { abs(i - it) }
+    fuelCost[i] = locations.sumOf { (0 .. abs(i - it)).sum() }
 }
 
 println(fuelCost.minOrNull())
